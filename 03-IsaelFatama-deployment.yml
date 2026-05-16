@@ -1,0 +1,51 @@
+# DEPLOYMENT
+# Describe el estado de un pod, ademas de hacer q ue kubernetes se encargue de mantener ese estado, es decir, si el pod se cae, el deployment se encargara de crear otro para mantener el estado deseado.
+# conceptos claves: replicas, selector, template, resources, volumeMounts
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+     name: isaelfatama-nginx
+     namespace: isaelfatama
+     labels:
+          app: isaelfatama-nginx
+spec:
+     replicas: 2
+
+     selector:
+          matchLabels:
+               app: isaelfatama-nginx
+
+     template:
+          metadata:
+               labels:
+                    app: isaelfatama-nginx
+          spec:
+               containers:
+                    - name: nginx
+                      image: nginx:1.25-alpine
+                      ports:
+                           - containerPort: 80
+
+                      env:
+                           - name: APP_ENV
+                             valueFrom:
+                                  configMapKeyRef:
+                                       name: isaelfatama-config
+                                       key: APP_ENV
+
+                           - name: APP_VERSION
+                             valueFrom:
+                                  configMapKeyRef:
+                                       name: isaelfatama-config
+                                       key: APP_VERSION
+                           - name: APP_PORT
+                             valueFrom:
+                                  configMapKeyRef:
+                                       name: isaelfatama-config
+                                       key: APP_PORT
+                           - name: SECRET_USERNAME
+                             valueFrom:
+                                  secretKeyRef:
+                                       name: isaelfatama-secret
+                                       key: username
